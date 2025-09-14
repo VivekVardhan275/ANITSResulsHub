@@ -12,4 +12,5 @@ import org.springframework.stereotype.Component;
 public class LogInWrapper {
     private Boolean success;
     private String typeOfUser;
+    private String jwtToken; // JWT token
 }
