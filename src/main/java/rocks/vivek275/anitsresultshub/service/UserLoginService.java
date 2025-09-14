@@ -11,30 +11,33 @@ import rocks.vivek275.anitsresultshub.security.JwtUtil;
 
 @Service
 public class UserLoginService {
+    @Autowired
+    private UserRepo userRepo;
 
     @Autowired
-    UserRepo userRepo;
-
-    @Autowired
-    JwtUtil jwtUtil;
+    private JwtUtil jwtUtil; // Inject JWT utility
 
     public ResponseEntity<LogInWrapper> login(String email, String username, String password) {
         BaseUser baseUser = userRepo.getBaseUserByEmail(email);
         if (baseUser == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            LogInWrapper wrapper = new LogInWrapper(false, null, null);
+            return new ResponseEntity<>(wrapper, HttpStatus.NOT_FOUND);
         }
 
         if (baseUser.getUsername().equals(username) && baseUser.getPassword().equals(password)) {
-            String token = jwtUtil.generateToken(baseUser.getEmail(), baseUser.getUsername(), baseUser.getTypeOfUser());
-
             LogInWrapper logInWrapper = new LogInWrapper();
             logInWrapper.setSuccess(true);
             logInWrapper.setTypeOfUser(baseUser.getTypeOfUser());
+
+            // Generate JWT token
+            String token = jwtUtil.generateToken(baseUser.getEmail(), baseUser.getUsername(), baseUser.getTypeOfUser());
             logInWrapper.setJwtToken(token);
 
             return new ResponseEntity<>(logInWrapper, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            LogInWrapper wrapper = new LogInWrapper(false, null, null);
+            return new ResponseEntity<>(wrapper, HttpStatus.UNAUTHORIZED);
         }
     }
 }
+
