@@ -40,4 +40,15 @@ public class FacultyRepo{
         return jdbcTemplate.queryForList(sql, year, semester, dept);
     }
      */
+    public List<Map<String, Object>> findFacultyByEmail(String email,String branch) {
+        String facultyTableName = String.format("faculty_%s",
+                branch.toLowerCase());
+        String sql = "select email from "+facultyTableName+" where email=?";
+        try {
+            return jdbcTemplate.queryForList(sql,email);
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
 }

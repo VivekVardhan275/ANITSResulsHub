@@ -44,20 +44,25 @@ public class RegisterController {
 
     @PostMapping("/faculty")
     public ResponseEntity<RegisterWrapper> signupFaculty(@RequestBody Faculty faculty) {
-        try {
-            BaseUser user = new BaseUser();
-            user.setEmail(faculty.getEmail());
-            user.setPassword(faculty.getPassword());
-            user.setUsername(faculty.getUsername());
-            user.setDepartment(faculty.getDepartment());
-            user.setTypeOfUser("faculty");
+        if (userValidationService.isValidFaculty(faculty.getEmail(), faculty.getDepartment())) {
+            try {
+                BaseUser user = new BaseUser();
+                user.setEmail(faculty.getEmail());
+                user.setPassword(faculty.getPassword());
+                user.setUsername(faculty.getUsername());
+                user.setDepartment(faculty.getDepartment());
+                user.setTypeOfUser("faculty");
 
-            return userRegistrationService.registerUser(user);
-        } catch (Exception ex) {
-            RegisterWrapper registerWrapper = new RegisterWrapper();
-            registerWrapper.setSuccess(false);
-            registerWrapper.setTypeOfUser(null);
-            return new ResponseEntity<>(registerWrapper, HttpStatus.INTERNAL_SERVER_ERROR);
+                return userRegistrationService.registerUser(user);
+            } catch (Exception ex) {
+                RegisterWrapper registerWrapper = new RegisterWrapper();
+                registerWrapper.setSuccess(false);
+                registerWrapper.setTypeOfUser(null);
+                return new ResponseEntity<>(registerWrapper, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        else {
+            return new ResponseEntity<>(new RegisterWrapper(false, "Not a Valid User"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
